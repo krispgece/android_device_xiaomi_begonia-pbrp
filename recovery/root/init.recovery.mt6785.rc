@@ -8,6 +8,10 @@ on init
     symlink /dev/block/platform/bootdevice /dev/block/bootdevice
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw
 
+    # configfs USB from the start (init.rc sets 0 at early-init), so that the
+    # recovery's init.rc builds the gadget, ffs.fastboot included, on fs
+    setprop sys.usb.configfs 1
+
     # Dynamic or legacy ROM: append the matching recovery.fstab and twrp.flags
     # entries before the recovery reads them (its service starts on boot)
     exec u:r:recovery:s0 -- /system/bin/begonia-layout.sh
