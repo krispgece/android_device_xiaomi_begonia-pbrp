@@ -1,12 +1,14 @@
 # begonia, dynamic layout (see recovery.fstab.dynamic). The logical partitions
-# only get display names here: no backup, no flashimg and no image entries,
+# get display names here, but no backup, no flashimg and no image entries,
 # because the raw system and vendor devices hold super, not a file system.
 # System is keyed system_root: the recovery moves it there before it reads
 # these flags. No odm line: a line here whose partition does not exist would
 # be added as an entry of its own.
+# wipeingui=0: PBRP lists System, System_EXT and Product in Advanced Wipe and
+# then refuses to wipe them; wiping a logical partition is the ROM zip's job.
 
 # <mount_point>  <fstype>  <device>        <device2>                  <flags>
-/system_root      auto     system                                              flags=display="System"
-/system_ext       auto     system_ext                                          flags=display="System_EXT"
-/product          auto     product                                             flags=display="Product"
-/vendor           auto     vendor                                              flags=display="Vendor"
+/system_root      auto     system                                              flags=display="System";wipeingui=0
+/system_ext       auto     system_ext                                          flags=display="System_EXT";wipeingui=0
+/product          auto     product                                             flags=display="Product";wipeingui=0
+/vendor           auto     vendor                                              flags=display="Vendor";wipeingui=0
