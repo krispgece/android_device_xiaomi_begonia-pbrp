@@ -154,12 +154,24 @@ TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone4/temp
 TW_PREPARE_DATA_MEDIA_EARLY := true
 
 # Dynamic partitions: fastbootd and the LP tools. PBRP honours the LP tool
-# flags only with PRODUCT_USE_DYNAMIC_PARTITIONS (unset, see device.mk).
+# flags only with PRODUCT_USE_DYNAMIC_PARTITIONS (unset, see device.mk), so the
+# files are listed by hand below.
 # The kernel has no configfs MTP function: no MTP.
 TW_INCLUDE_FASTBOOTD := true
 TW_INCLUDE_LPDUMP := true
 TW_INCLUDE_LPTOOLS := true
 TW_EXCLUDE_MTP := true
+
+# The LP tools and the libraries they link (system/extras partition_tools);
+# lpdump asks lpdumpd for the dump (recovery/root/system/etc/init/lpdumpd.rc)
+TW_RECOVERY_ADDITIONAL_RELINK_BINARY_FILES += \
+    $(TARGET_OUT_EXECUTABLES)/lpdump \
+    $(TARGET_OUT_EXECUTABLES)/lpdumpd \
+    $(TARGET_OUT_EXECUTABLES)/lptools
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
+    $(TARGET_OUT_SHARED_LIBRARIES)/liblpdump.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/liblpdump_interface-cpp.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libprotobuf-cpp-full.so
 
 # Debug flags
 TWRP_INCLUDE_LOGCAT := true
