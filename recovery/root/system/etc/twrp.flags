@@ -11,11 +11,11 @@
 /recovery         emmc     /dev/block/platform/bootdevice/by-name/recovery     flags=backup=1;display="Recovery"
 /vbmeta           emmc     /dev/block/platform/bootdevice/by-name/vbmeta       flags=backup=1;display="VBMeta";flashimg=1
 
-/nvcfg            ext4     /dev/block/platform/bootdevice/by-name/nvcfg        flags=backup=1;display="NVCFG"
-/nvdata           ext4     /dev/block/platform/bootdevice/by-name/nvdata       flags=backup=1;display="NVDATA"
-/nvram            emmc     /dev/block/platform/bootdevice/by-name/nvram        flags=backup=1;display="NVRAM"
-/protect_f        ext4     /dev/block/platform/bootdevice/by-name/protect1     flags=backup=1;display="Protect F"
-/protect_s        ext4     /dev/block/platform/bootdevice/by-name/protect2     flags=backup=1;display="Protect S"
+/nvcfg            ext4     /dev/block/platform/bootdevice/by-name/nvcfg        flags=backup=1;display="NVCFG";perdevice
+/nvdata           ext4     /dev/block/platform/bootdevice/by-name/nvdata       flags=backup=1;display="NVDATA";perdevice
+/nvram            emmc     /dev/block/platform/bootdevice/by-name/nvram        flags=backup=1;display="NVRAM";perdevice
+/protect_f        ext4     /dev/block/platform/bootdevice/by-name/protect1     flags=backup=1;display="Protect F";perdevice
+/protect_s        ext4     /dev/block/platform/bootdevice/by-name/protect2     flags=backup=1;display="Protect S";perdevice
 
 /metadata         ext4     /dev/block/platform/bootdevice/by-name/metadata     flags=backup=1;display="Metadata"
 /persist          ext4     /dev/block/platform/bootdevice/by-name/persist      flags=backup=1;display="Persist"
