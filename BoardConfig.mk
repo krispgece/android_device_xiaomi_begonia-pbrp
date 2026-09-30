@@ -96,6 +96,10 @@ BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
+# The build appends buildvariant=$(TARGET_BUILD_VARIANT) to the header cmdline.
+# mkbootimg keeps the last --cmdline and these args come after the build's own,
+# so the header gets exactly BOARD_KERNEL_CMDLINE.
+BOARD_MKBOOTIMG_ARGS += --cmdline "$(BOARD_KERNEL_CMDLINE)"
 
 # Kernel Binary
 TARGET_KERNEL_VERSION := 4.14
