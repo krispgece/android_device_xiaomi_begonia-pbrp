@@ -1,64 +1,107 @@
-Device configuration for Redmi Note 8 Pro (begonia)
-===================================================
+PitchBlack Recovery (PBRP) device tree for Redmi Note 8 Pro (begonia)
+=====================================================================
 
-The Redmi Note 8 Pro (codenamed _"begonia"_) is a high-end, mid-range smartphone from Xiaomi.
-It was released in September 2019.
+Device configuration for building PitchBlack Recovery Project (PBRP) 12.1 for the
+Redmi Note 8 Pro (begonia, MediaTek Helio G90T / MT6785). One image handles both
+partition layouts that begonia ROMs use:
 
-| Basic                   | Spec Sheet                                                                                                                     |
-| -----------------------:|:------------------------------------------------------------------------------------------------------------------------------ |
-| CPU                     | Octa-core                                                                                                                      |
-| Chipset                 | Mediatek Helio G90T                                                                                                            |
-| GPU                     | Mali-G76 MC4                                                                                                                   |
-| Memory                  | 6/8 GB RAM                                                                                                                     |
-| Shipped Android Version | 9.0                                                                                                                            |
-| Storage                 | 64/128/256 GB                                                                                                                  |
-| Battery                 | Non-removable Li-Po 4500 mAh battery                                                                                           |
-| Display                 | 1080 x 2340 pixels, 19.5:9 ratio (~395 ppi density)                                                                            |
-| Camera (Rear - Main)    | 64 MP, f/1.9, 26mm (wide), 1/1.7", 0.8µm, PDAF                                                                                 |
-| Camera (Front)          | 20 MP, f/2.0, 0.9µm                                                                                                            |
+| Layout  | Partitions | Examples |
+| ------- | ---------- | -------- |
+| dynamic | Retrofit dynamic partitions: super spans `by-name/system` and `by-name/vendor`, LP metadata on `by-name/system` (`androidboot.super_partition=system`); logical `system`, `system_ext`, `product`, `vendor` (and `odm` where a ROM has it) | current Infinity-X builds |
+| legacy  | Plain `system` and `vendor` partitions (erofs or ext4) | static builds and older ROMs |
 
-# Status
-Current state of features (from [here](https://twrp.me/faq/OfficialMaintainer.html)):
+**Status: not tested on a device yet.** No ROM has been verified with this tree so far;
+tested ROMs will be listed here by name.
 
-### Blocking checks
-- [x] Correct screen/recovery size
-- [x] Working Touch, screen
-- [x] Backup to internal/microSD
-- [x] Restore from internal/microSD
-- [x] reboot to system
-- [x] ADB
+## How the layout is chosen
 
-### Medium checks
-- [x] update.zip sideload
-- [x] UI colors (red/blue inversions)
-- [x] Screen goes off and on
-- [x] F2FS/EXT4 Support, exFAT/NTFS where supported
-- [x] all important partitions listed in mount/backup lists
-- [x] backup/restore to/from external (USB-OTG) storage (not supported by the device)
-- [x] backup/restore to/from adb (https://gerrit.omnirom.org/#/c/15943/)
-- [x] decrypt /data
-- [x] Correct date
+`recovery/root/system/bin/begonia-layout.sh` runs from `init.recovery.mt6785.rc` at
+`on init`, before the recovery starts, and reads `by-name/system`:
 
-### Minor checks
-- [x] MTP export
-- [x] reboot to bootloader
-- [x] reboot to recovery
-- [x] poweroff
-- [x] battery level
-- [x] temperature
-- [x] encrypted backups
-- [x] input devices via USB (USB-OTG) - keyboard, mouse and disks (not supported by the device)
-- [x] USB mass storage export
-- [x] set brightness
-- [x] vibrate
-- [x] screenshot
-- [x] partition SD card
+- **dynamic**: valid LP geometry and metadata header, and no file system superblock in
+  the first 4 KiB. `recovery.fstab.dynamic` and `twrp.flags.dynamic` are appended: the
+  logical partitions, read-only, with no backup, flash or image entries.
+  `ro.boot.dynamic_partitions` is set to `true` in this mode only.
+- **legacy**: no LP metadata and an erofs or ext4 superblock. `recovery.fstab.legacy` and
+  `twrp.flags.legacy` are appended: raw System and Vendor, System Image and Vendor Image.
+- **unknown**: anything else. Nothing is appended, so no System or Vendor entry exists,
+  and the recovery shows a warning.
 
-# Building
+The result is in the property `twrp.begonia.layout`. After installing a ROM with the
+other layout, use Reboot > Recovery before using Wipe, Backup or Install Image.
+
+## Warnings
+
+- **NVRAM, NVDATA, NVCFG and Protect (protect1/protect2) backups belong to the phone they
+  were made on.** They hold its IMEI, modem calibration and SIM data. Never restore them
+  on another phone; that breaks the IMEI and the radio. These partitions carry the
+  `perdevice` flag: they are not pre-selected for restore, and restoring one prints a
+  warning. Persist holds per-phone data too (calibration, keys): restore only your own
+  backup.
+- **Never back up, restore or flash "Super".** On begonia super spans two partitions; a
+  single-device Super image is incomplete. This tree does not create a Super entry.
+- Install Image is not offered for Persist.
+- MTP is disabled (the recovery kernel has no configfs MTP function).
+
+## Differences from the base tree
+
+Forked from [Saikrishna1504/device_xiaomi_begonia-pbrp](https://github.com/Saikrishna1504/device_xiaomi_begonia-pbrp)
+at `3bf5154` ("begonia: Fix Decryption", FBE v1). Its later FBEv2/keydirectory changes are
+not taken; `/data` here matches the ROM (FBE v1, inlinecrypt, no keydirectory).
+
+- PBRP product naming (`pb_begonia`, Sai's `18dadeb`).
+- Super block from the ROM's BoardConfig.mk, `TW_SUPER_MULTI_BLOCK_DEVICES`.
+- Header cmdline: `androidboot.init_fatal_reboot_target=recovery` (LK passes the recovery's
+  cmdline on to every normal boot, so `bootloader` there would also apply to the ROM),
+  `androidboot.super_partition=system` added by hand, no `buildvariant=` in the header.
+  `androidboot.selinux=permissive` is still in the header.
+- Runtime layout switch (above), `/data`, `/metadata` and `/cache` from the ROM's fstab.
+- fastbootd, lpdump/lpdumpd and lptools in the ramdisk, without
+  `PRODUCT_USE_DYNAMIC_PARTITIONS` (that flag would put `ro.boot.dynamic_partitions=true`
+  into `prop.default` for static ROMs too).
+- USB gadget built by the recovery's `init.rc` (configfs from `on init`), so fastbootd
+  gets its `ffs.fastboot` function.
+- Kept as they were: kernel and dtbo prebuilts, boot image geometry, AVB, the crypto
+  flags, the keymaster/gatekeeper/TEE blobs, the `PB_*` flags, and the version spoof
+  (`PLATFORM_VERSION 99.87.36`, security patch 2099-12-31).
+
+## Building
+
+This tree needs the begonia patch series for PBRP's `bootable/recovery`
+(branch `android-12.1-begonia` on top of PBRP `android-12.1`): the layout property, the
+LP-metadata super check, `TW_SUPER_MULTI_BLOCK_DEVICES` and the `perdevice` flag come from
+there.
+
 ```bash
-source build/envsetup.sh
-lunch twrp_begonia-eng
-mka recoveryimage -j$(nproc --all)
+repo init --depth=1 -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-12.1
+# add a local manifest with this tree at device/xiaomi/begonia and the patched
+# bootable/recovery, then
+repo sync -c --no-tags --no-clone-bundle
+export ALLOW_MISSING_DEPENDENCIES=true
+. build/envsetup.sh
+lunch pb_begonia-eng
+mka recoveryimage   # or: mka pbrp (image plus flashable zip)
 ```
 
-**Copyright (C) 2022 Team Win Recovery Project**
+## Sources
+
+- Device tree base: [Saikrishna1504/device_xiaomi_begonia-pbrp](https://github.com/Saikrishna1504/device_xiaomi_begonia-pbrp) (`3bf5154`, `18dadeb`)
+- Recovery: [PitchBlackRecoveryProject/android_bootable_recovery](https://github.com/PitchBlackRecoveryProject/android_bootable_recovery) (`android-12.1`) plus the begonia patch series
+- Manifest: [PitchBlackRecoveryProject/manifest_pb](https://github.com/PitchBlackRecoveryProject/manifest_pb) (`android-12.1`)
+- Prebuilt kernel (`prebuilt/Image.gz`, dtb, dtbo): built from [begonia-recovery/twrp_kernel_xiaomi_begonia](https://github.com/begonia-recovery/twrp_kernel_xiaomi_begonia) (`twrp-12.1`, `9f08459a`)
+- Partition values: the ROM's device tree (`device/redmi/begonia`, BoardConfig.mk and fstab.mt6785)
+
+## Credits
+
+- Saikrishna1504 and Shamik: the PBRP begonia device tree, the decryption setup and the
+  TEE/keymaster blobs this tree is built on
+- The begonia-recovery kernel project: the recovery kernel source
+- WuXing90: the idea of one recovery image that picks the partition layout at boot
+  (Unified TWRP)
+- PitchBlack Recovery Project: PBRP
+- Team Win Recovery Project: TWRP, which PBRP is based on
+- SebaUbuntu's TWRP device tree generator: the original tree layout
+
+## License
+
+Apache-2.0 (see the SPDX headers); prebuilt blobs belong to their respective owners.
