@@ -54,6 +54,24 @@ TARGET_USERIMAGES_USE_F2FS := true
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_USES_MKE2FS := true
 
+# Super, copied verbatim from the ROM (device/redmi/begonia BoardConfig.mk).
+# PBRP's build only reads this block with PRODUCT_USE_DYNAMIC_PARTITIONS := true,
+# which stays unset here (see device.mk); the recovery finds the layout of the
+# installed ROM at boot instead (recovery/root/system/bin/begonia-layout.sh).
+# Dynamic partitions (super = stock system + vendor, metadata on system)
+BOARD_SUPER_PARTITION_BLOCK_DEVICES := system vendor
+BOARD_SUPER_PARTITION_METADATA_DEVICE := system
+BOARD_SUPER_PARTITION_SYSTEM_DEVICE_SIZE := 3758096384
+BOARD_SUPER_PARTITION_VENDOR_DEVICE_SIZE := 1610612736
+BOARD_SUPER_PARTITION_SIZE := 5368709120
+BOARD_SUPER_PARTITION_GROUPS := xiaomi_dynamic_partitions
+BOARD_XIAOMI_DYNAMIC_PARTITIONS_SIZE := 5364514816
+BOARD_XIAOMI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor
+
+# Super spans two block devices: a raw Super entry would cover by-name/system
+# only, so don't create one (needs the begonia bootable/recovery patches)
+TW_SUPER_MULTI_BLOCK_DEVICES := true
+
 # Kernel
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive androidboot.usbconfigfs=true androidboot.init_fatal_reboot_target=bootloader
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image.gz
