@@ -1,0 +1,22 @@
+# begonia, dynamic layout: super spans by-name/system and by-name/vendor,
+# LP metadata on by-name/system (androidboot.super_partition=system).
+# begonia-layout.sh appends this file to recovery.fstab when it finds valid
+# LP metadata on by-name/system.
+# Every logical partition a begonia ROM may have is listed, read-only: the
+# recovery never writes to them itself, and its static/dynamic handling only
+# sees partitions that have an entry here. Partitions the installed ROM does
+# not have are dropped at startup.
+# The first line of a mount point gives the default type; the recovery probes
+# the real one and uses the matching line.
+
+#<src>        <mnt_point>     <type>   <mnt_flags and options>   <fs_mgr_flags>
+system        /system         erofs    ro                        wait,logical
+system        /system         ext4     ro                        wait,logical
+system_ext    /system_ext     erofs    ro                        wait,logical
+system_ext    /system_ext     ext4     ro                        wait,logical
+product       /product        erofs    ro                        wait,logical
+product       /product        ext4     ro                        wait,logical
+vendor        /vendor         ext4     ro                        wait,logical
+vendor        /vendor         erofs    ro                        wait,logical
+odm           /odm            erofs    ro                        wait,logical
+odm           /odm            ext4     ro                        wait,logical

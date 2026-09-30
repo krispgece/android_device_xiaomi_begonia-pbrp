@@ -1,0 +1,9 @@
+# begonia, legacy layout: plain system and vendor partitions (static ROMs).
+# begonia-layout.sh appends this file to recovery.fstab when by-name/system
+# has no LP metadata and holds an erofs or ext4 file system.
+# Type auto: static system is erofs on current builds and ext4 on older ones;
+# the recovery probes it. Read-only, as before; no avb flags.
+
+#<src>                                           <mnt_point>           <type>   <mnt_flags and options>                                         <fs_mgr_flags>
+/dev/block/platform/bootdevice/by-name/system    /system               auto     ro                                                              wait
+/dev/block/platform/bootdevice/by-name/vendor    /vendor               auto     ro                                                              wait

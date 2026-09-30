@@ -1,0 +1,9 @@
+# begonia, legacy layout (see recovery.fstab.legacy): the raw system and vendor
+# partitions, as the static-only tree had them. Type auto: erofs or ext4, the
+# recovery probes it.
+
+# <mount_point>  <fstype>  <device>        <device2>                  <flags>
+/system_root      auto     /dev/block/platform/bootdevice/by-name/system       flags=backup=1;display="System";wipeingui
+/vendor           auto     /dev/block/platform/bootdevice/by-name/vendor       flags=backup=1;display="Vendor";wipeingui
+/system_image     emmc     /dev/block/platform/bootdevice/by-name/system       flags=backup=1;display="System Image";flashimg=1
+/vendor_image     emmc     /dev/block/platform/bootdevice/by-name/vendor       flags=backup=1;display="Vendor Image";flashimg=1

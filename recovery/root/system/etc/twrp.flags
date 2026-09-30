@@ -19,11 +19,9 @@
 
 /metadata         ext4     /dev/block/platform/bootdevice/by-name/metadata     flags=backup=1;display="Metadata"
 /persist          ext4     /dev/block/platform/bootdevice/by-name/persist      flags=backup=1;display="Persist"
-/system_root      ext4     /dev/block/platform/bootdevice/by-name/system       flags=backup=1;display="System";wipeingui
-/vendor           ext4     /dev/block/platform/bootdevice/by-name/vendor       flags=backup=1;display="Vendor";wipeingui
+# System and vendor: twrp.flags.dynamic or twrp.flags.legacy, appended
+# at boot by begonia-layout.sh.
 /persist_image    emmc     /dev/block/platform/bootdevice/by-name/persist      flags=backup=1;display="Persist Image";flashimg=1
-/system_image     emmc     /dev/block/platform/bootdevice/by-name/system       flags=backup=1;display="System Image";flashimg=1
-/vendor_image     emmc     /dev/block/platform/bootdevice/by-name/vendor       flags=backup=1;display="Vendor Image";flashimg=1
 
 /external_sd      vfat     /dev/block/mmcblk0p1  /dev/block/mmcblk0            flags=display="MicroSD";storage;wipeingui;removable;fsflags="utf8"
 /usbstorage       vfat     /dev/block/sdd1  /dev/block/sdd                     flags=display="USB Storage";storage;wipeingui;removable;fsflags="utf8"

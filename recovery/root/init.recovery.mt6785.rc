@@ -8,6 +8,10 @@ on init
     symlink /dev/block/platform/bootdevice /dev/block/bootdevice
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw
 
+    # Dynamic or legacy ROM: append the matching recovery.fstab and twrp.flags
+    # entries before the recovery reads them (its service starts on boot)
+    exec u:r:recovery:s0 -- /system/bin/begonia-layout.sh
+
 on property:ro.crypto.state=encrypted && property:ro.crypto.type=file
     install_keyring
 
