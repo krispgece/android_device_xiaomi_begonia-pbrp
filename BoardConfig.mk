@@ -153,6 +153,14 @@ TW_FRAMERATE := 60
 TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone4/temp
 TW_PREPARE_DATA_MEDIA_EARLY := true
 
+# Dynamic partitions: fastbootd and the LP tools. PBRP honours the LP tool
+# flags only with PRODUCT_USE_DYNAMIC_PARTITIONS (unset, see device.mk).
+# The kernel has no configfs MTP function: no MTP.
+TW_INCLUDE_FASTBOOTD := true
+TW_INCLUDE_LPDUMP := true
+TW_INCLUDE_LPTOOLS := true
+TW_EXCLUDE_MTP := true
+
 # Debug flags
 TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true

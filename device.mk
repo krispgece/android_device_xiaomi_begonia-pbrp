@@ -29,3 +29,13 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
 
 PRODUCT_PACKAGES += \
     libshim_beanpod
+
+# Dynamic partitions. PRODUCT_USE_DYNAMIC_PARTITIONS stays unset on purpose:
+# it would bake ro.boot.dynamic_partitions=true into prop.default for static
+# ROMs too. recovery/root/system/bin/begonia-layout.sh sets that property at
+# boot, in dynamic mode only.
+PRODUCT_PACKAGES += \
+    fastbootd
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.fastbootd.available=true
