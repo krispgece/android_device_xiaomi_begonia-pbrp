@@ -73,7 +73,12 @@ BOARD_XIAOMI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vend
 TW_SUPER_MULTI_BLOCK_DEVICES := true
 
 # Kernel
-BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive androidboot.usbconfigfs=true androidboot.init_fatal_reboot_target=bootloader
+# LK prepends this cmdline to every normal boot as well, so it must suit the ROM:
+# - init_fatal_reboot_target=recovery, as the ROM itself sets it;
+# - super_partition=system: fs_mgr reads it only from the cmdline, and the build
+#   adds it only with PRODUCT_USE_DYNAMIC_PARTITIONS (unset here);
+# - selinux=permissive stays until the recovery can go permissive another way.
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive androidboot.usbconfigfs=true androidboot.init_fatal_reboot_target=recovery androidboot.super_partition=system
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image.gz
 BOARD_PREBUILT_DTBIMAGE_DIR := $(DEVICE_PATH)/prebuilt/dtb
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
