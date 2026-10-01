@@ -36,8 +36,8 @@ other layout, use Reboot > Recovery before using Wipe, Backup or Install Image.
   were made on.** They hold its IMEI, modem calibration and SIM data. Never restore them
   on another phone; that breaks the IMEI and the radio. These partitions carry the
   `perdevice` flag: they are not pre-selected for restore, and restoring one prints a
-  warning. Persist holds per-phone data too (calibration, keys): restore only your own
-  backup.
+  warning. Persist holds per-phone data too (calibration, keys) and carries the same
+  flag: restore only your own backup.
 - **Never back up, restore or flash "Super".** On begonia super spans two partitions; a
   single-device Super image is incomplete. This tree does not create a Super entry.
 - Install Image is not offered for Persist.
