@@ -180,3 +180,8 @@ TARGET_USES_LOGD := true
 # PBRP specific build flags
 PB_DISABLE_DEFAULT_DM_VERITY := true
 PB_DISABLE_DEFAULT_TREBLE_COMP := true
+
+# Unofficial build: PitchBlack's build looks up the official maintainer of
+# this codename (pb_devices.json) and compiles it into the recovery binary.
+# Keep it out; lunch re-exports PB_CODE, so this has to be set here.
+MAINTAINER :=
