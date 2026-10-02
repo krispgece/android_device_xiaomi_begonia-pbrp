@@ -61,8 +61,12 @@ not taken; `/data` here matches the ROM (FBE v1, inlinecrypt, no keydirectory).
   into `prop.default` for static ROMs too).
 - USB gadget built by the recovery's `init.rc` (configfs from `on init`), so fastbootd
   gets its `ffs.fastboot` function.
-- Kept as they were: kernel and dtbo prebuilts, boot image geometry, AVB, the crypto
-  flags, the keymaster/gatekeeper/TEE blobs, the `PB_*` flags, and the version spoof
+- Kernel from the ROM's kernel source (see Sources). It is the ROM's configuration with
+  `CONFIG_BEGONIA_BLANK_PERMISSIVE_CMDLINE` turned off, so `androidboot.selinux=permissive`
+  from the header reaches the recovery.
+- Kept as they were: the dtb and dtbo prebuilts (LK also reads the recovery's dtb on normal
+  boots and panics on the ROM's overlay-first dtb section), boot image geometry, AVB, the
+  crypto flags, the keymaster/gatekeeper/TEE blobs, the `PB_*` flags, and the version spoof
   (`PLATFORM_VERSION 99.87.36`, security patch 2099-12-31).
 
 ## Building
@@ -88,14 +92,15 @@ mka recoveryimage   # or: mka pbrp (image plus flashable zip)
 - Device tree base: [Saikrishna1504/device_xiaomi_begonia-pbrp](https://github.com/Saikrishna1504/device_xiaomi_begonia-pbrp) (`3bf5154`, `18dadeb`)
 - Recovery: [PitchBlackRecoveryProject/android_bootable_recovery](https://github.com/PitchBlackRecoveryProject/android_bootable_recovery) (`android-12.1`) plus the begonia patch series
 - Manifest: [PitchBlackRecoveryProject/manifest_pb](https://github.com/PitchBlackRecoveryProject/manifest_pb) (`android-12.1`)
-- Prebuilt kernel (`prebuilt/Image.gz`, dtb, dtbo): built from [begonia-recovery/twrp_kernel_xiaomi_begonia](https://github.com/begonia-recovery/twrp_kernel_xiaomi_begonia) (`twrp-12.1`, `9f08459a`)
+- Prebuilt kernel (`prebuilt/Image.gz`): built from [krispgece/kernel_xiaomi_mt6785](https://github.com/krispgece/kernel_xiaomi_mt6785) at `e75824e1` (`begonia-16` plus the switch for the permissive blanking), `begonia_user_defconfig` with `CONFIG_BEGONIA_BLANK_PERMISSIVE_CMDLINE` off, clang r563880c (the ROM's)
+- dtb and dtbo: built from [begonia-recovery/twrp_kernel_xiaomi_begonia](https://github.com/begonia-recovery/twrp_kernel_xiaomi_begonia) (`twrp-12.1`, `9f08459a`), which earlier builds also used for the kernel; its mt6785 base differs from the ROM kernel's only in the `loop.max_part` boot argument
 - Partition values: the ROM's device tree (`device/redmi/begonia`, BoardConfig.mk and fstab.mt6785)
 
 ## Credits
 
 - Saikrishna1504 and Shamik: the PBRP begonia device tree, the decryption setup and the
   TEE/keymaster blobs this tree is built on
-- The begonia-recovery kernel project: the recovery kernel source
+- The begonia-recovery kernel project: the dtb and dtbo, and the recovery kernel source of the earlier builds
 - WuXing90: the idea of one recovery image that picks the partition layout at boot
   (Unified TWRP)
 - PitchBlack Recovery Project: PBRP
