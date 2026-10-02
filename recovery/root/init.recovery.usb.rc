@@ -6,9 +6,6 @@ on init
     # ROM binds too; the ro.boot.usbcontroller trigger below overrides it
     setprop sys.usb.controller musb-hdrc
 
-on property:hwservicemanager.ready=true
-    setprop sys.usb.config adb
-
 on boot
     setprop sys.usb.configfs 1
     setprop sys.usb.ffs.aio_compat 1
@@ -17,7 +14,6 @@ on boot
     setprop vendor.usb.acm_port0 ""
     setprop vendor.usb.acm_port1 ""
     setprop vendor.usb.acm_enable 0
-    setprop sys.usb.config adb
 
 on property:ro.boot.usbcontroller=*
     setprop sys.usb.controller ${ro.boot.usbcontroller}
