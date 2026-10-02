@@ -62,3 +62,10 @@ on property:twrp.decrypt.done=true
     stop gatekeeper-1-0
     stop servicemanager
     stop hwservicemanager
+
+# fastbootd and the battery readout ask for the health HAL that the vendor
+# manifest declares (android.hardware.health@2.1); recovery does not start
+# class hal, so start it once hwservicemanager is up, or fastbootd waits
+# for it forever and never sets up its USB function.
+on property:hwservicemanager.ready=true
+    start health-hal-2-1
