@@ -54,16 +54,19 @@ not taken; `/data` here matches the ROM (FBE v1, inlinecrypt, no keydirectory).
 - Header cmdline: `androidboot.init_fatal_reboot_target=recovery` (LK passes the recovery's
   cmdline on to every normal boot, so `bootloader` there would also apply to the ROM),
   `androidboot.super_partition=system` added by hand, no `buildvariant=` in the header.
-  `androidboot.selinux=permissive` is still in the header.
+  The header does not carry `androidboot.selinux=permissive`, so LK does not pass that
+  token on to any ROM; the recovery kernel stays permissive by itself (next item).
 - Runtime layout switch (above), `/data`, `/metadata` and `/cache` from the ROM's fstab.
 - fastbootd, lpdump/lpdumpd and lptools in the ramdisk, without
   `PRODUCT_USE_DYNAMIC_PARTITIONS` (that flag would put `ro.boot.dynamic_partitions=true`
   into `prop.default` for static ROMs too).
 - USB gadget built by the recovery's `init.rc` (configfs from `on init`), so fastbootd
   gets its `ffs.fastboot` function.
-- Kernel from the ROM's kernel source (see Sources). It is the ROM's configuration with
-  `CONFIG_BEGONIA_BLANK_PERMISSIVE_CMDLINE` turned off, so `androidboot.selinux=permissive`
-  from the header reaches the recovery.
+- Kernel from the ROM's kernel source (see Sources). It is the ROM's configuration plus
+  `CONFIG_SECURITY_SELINUX_STAY_PERMISSIVE`, so SELinux stays permissive in the recovery
+  whichever ROM is installed: when init asks for enforcing mode, the kernel reports
+  success and stays permissive (dmesg: "staying permissive"). The ROM kernel leaves the
+  option off, and each ROM sets its own SELinux mode.
 - Kept as they were: the dtb and dtbo prebuilts (LK also reads the recovery's dtb on normal
   boots and panics on the ROM's overlay-first dtb section), boot image geometry, AVB, the
   crypto flags, the keymaster/gatekeeper/TEE blobs, the `PB_*` flags, and the version spoof
@@ -92,7 +95,7 @@ mka recoveryimage   # or: mka pbrp (image plus flashable zip)
 - Device tree base: [Saikrishna1504/device_xiaomi_begonia-pbrp](https://github.com/Saikrishna1504/device_xiaomi_begonia-pbrp) (`3bf5154`, `18dadeb`)
 - Recovery: [PitchBlackRecoveryProject/android_bootable_recovery](https://github.com/PitchBlackRecoveryProject/android_bootable_recovery) (`android-12.1`) plus the begonia patch series
 - Manifest: [PitchBlackRecoveryProject/manifest_pb](https://github.com/PitchBlackRecoveryProject/manifest_pb) (`android-12.1`)
-- Prebuilt kernel (`prebuilt/Image.gz`): built from [krispgece/kernel_xiaomi_mt6785](https://github.com/krispgece/kernel_xiaomi_mt6785) at `e75824e1` (`begonia-16` plus the switch for the permissive blanking), `begonia_user_defconfig` with `CONFIG_BEGONIA_BLANK_PERMISSIVE_CMDLINE` off, clang r563880c (the ROM's)
+- Prebuilt kernel (`prebuilt/Image.gz`): built from [krispgece/kernel_xiaomi_mt6785](https://github.com/krispgece/kernel_xiaomi_mt6785) at `17775678` (`begonia-16` plus the option that keeps a recovery kernel permissive), `begonia_user_defconfig` with `CONFIG_SECURITY_SELINUX_STAY_PERMISSIVE` on, clang r563880c (the ROM's)
 - dtb and dtbo: built from [begonia-recovery/twrp_kernel_xiaomi_begonia](https://github.com/begonia-recovery/twrp_kernel_xiaomi_begonia) (`twrp-12.1`, `9f08459a`), which earlier builds also used for the kernel; its mt6785 base differs from the ROM kernel's only in the `loop.max_part` boot argument
 - Partition values: the ROM's device tree (`device/redmi/begonia`, BoardConfig.mk and fstab.mt6785)
 
