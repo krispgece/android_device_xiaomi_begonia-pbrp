@@ -12,6 +12,10 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
 # Inherit from begonia device
 $(call inherit-product, device/xiaomi/begonia/device.mk)
 
+# Unofficial build tag in ro.pb.version / ro.modversion; vendor/pb/config/version.mk
+# only sets its default (HOMEMADE) when this is undefined, so set it first.
+ROM_BUILDTYPE := krispgece-UNOFFICIAL
+
 # Inherit some common PBRP stuff.
 $(call inherit-product, vendor/pb/config/common.mk)
 
