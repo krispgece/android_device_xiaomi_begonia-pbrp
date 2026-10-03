@@ -180,6 +180,9 @@ TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
 
 # PBRP specific build flags
+# Shown as PBRP-4.0-krispgece-UNOFFICIAL on the main screen (needs the
+# PB_UNOFFICIAL_TAG patch in bootable/recovery)
+PB_UNOFFICIAL_TAG := krispgece
 PB_DISABLE_DEFAULT_DM_VERITY := true
 PB_DISABLE_DEFAULT_TREBLE_COMP := true
 
