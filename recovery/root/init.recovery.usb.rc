@@ -99,3 +99,26 @@ on property:sys.usb.ffs.ready=1 && property:sys.usb.config=mtp,adb
     symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
+
+# After a reboot from the recovery into the recovery or fastbootd, the D+/D-
+# lines can stay on the charger-detection switch: the gadget is bound and the
+# cable reads as a USB host, but the host never sees the device until a
+# replug. Only a PHY re-init clears that, so begonia-usb-kick cycles the mtu3
+# controller out of and back into device mode, as a replug would, when the
+# gadget is not configured 15 s into a USB mode and has seen no bus reset
+# (system/bin/begonia-usb-kick.sh).
+service begonia-usb-kick /system/bin/begonia-usb-kick.sh
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+on property:sys.usb.state=adb
+    start begonia-usb-kick
+
+on property:sys.usb.state=sideload
+    start begonia-usb-kick
+
+on property:sys.usb.state=fastboot
+    start begonia-usb-kick

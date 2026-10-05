@@ -31,6 +31,7 @@ The result is in the property `twrp.begonia.layout`. After installing a ROM with
 
 - **addon.d does not run on ROMs with an erofs system** (all current Infinity-X builds for begonia). The ROM's backuptool mounts system with `-o rw,discard`, which erofs rejects, so backup and restore are skipped in any recovery. After an update, flash GApps or Magisk again if you added them yourself.
 - **This recovery does not make your ROM permissive.** Older begonia recoveries carry `androidboot.selinux=permissive` in their header, and LK passes it on to every normal boot. This one does not, so each ROM boots in its own SELinux mode. A ROM that only worked because of that leaked flag now boots enforcing, as it would with a stock recovery.
+- After Reboot > Recovery, `adb reboot recovery`, `adb reboot fastboot` or `fastboot reboot recovery`, adb or fastboot can take about 30 s to show up on some computers, because the USB link is re-initialised first (see `begonia-usb-kick` below). Wait for it before replugging the cable.
 - Inside the recovery, `setenforce 1` has no effect: SELinux stays permissive and the kernel logs the request.
 - The version spoof (Android 99.87.36, security patch 2099-12-31) is kept for decryption, as in the base tree.
 
@@ -54,6 +55,7 @@ Forked from [Saikrishna1504/device_xiaomi_begonia-pbrp](https://github.com/Saikr
 - Runtime layout switch (above), `/data`, `/metadata` and `/cache` from the ROM's fstab.
 - fastbootd, lpdump/lpdumpd and lptools in the ramdisk, without `PRODUCT_USE_DYNAMIC_PARTITIONS` (that flag would put `ro.boot.dynamic_partitions=true` into `prop.default` for static ROMs too).
 - USB gadget built by the recovery's `init.rc` (configfs from `on init`), so fastbootd gets its `ffs.fastboot` function. adb is bound once, by that `init.rc`, and the USB mode is left to the recovery (no extra `sys.usb.config=adb` triggers).
+- `begonia-usb-kick` (in `init.recovery.usb.rc`): after a reboot from the recovery into the recovery or fastbootd, the charger driver can leave the USB data lines on its charger-detection switch, and the computer does not see the phone until the cable is replugged. When adb, sideload or fastbootd has not been enumerated 15 s into the USB mode and the controller has seen no bus reset, the service re-initialises the USB PHY, as a replug would (at most twice). It does nothing on wall chargers or in USB host mode. Log: `/tmp/begonia-usb-kick.log`.
 - The health HAL is started once hwservicemanager is up: fastbootd waits for it, and the battery readout uses it.
 - The official maintainer lookup is off (`MAINTAINER :=`), and the version carries `krispgece-UNOFFICIAL` (`ROM_BUILDTYPE`, `PB_UNOFFICIAL_TAG`).
 - Kernel from the ROM's kernel source (see Sources). It is the ROM's configuration plus `CONFIG_SECURITY_SELINUX_STAY_PERMISSIVE`, so SELinux stays permissive in the recovery whichever ROM is installed: when init asks for enforcing mode, the kernel reports success and stays permissive (dmesg: "staying permissive"). The ROM kernel leaves the option off, and each ROM sets its own SELinux mode.
