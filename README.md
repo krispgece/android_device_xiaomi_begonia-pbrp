@@ -8,7 +8,7 @@ Device configuration for building PitchBlack Recovery Project (PBRP) 12.1 for th
 | dynamic | Retrofit dynamic partitions: super spans `by-name/system` and `by-name/vendor`, LP metadata on `by-name/system` (`androidboot.super_partition=system`); logical `system`, `system_ext`, `product`, `vendor` (and `odm` where a ROM has it) | current Infinity-X builds |
 | legacy  | Plain `system` and `vendor` partitions (erofs or ext4) | static builds and older ROMs |
 
-**Status: tested on a Redmi Note 8 Pro with Project Infinity-X 3.12 (Android 16):** the dynamic builds of 25.09.2026 and 30.09.2026 (GApps) and the static build of 01.10.2026 (GApps). Checked on the phone: boot, display, touch and adb; decryption with and without a lock-screen PIN (FBE v1); ADB sideload, also with the screen off and with cancel attempts during the install; dirty flash, clean install and downgrade; the ROM's Updater "Local update"; fastbootd in both layouts; and a full round trip from dynamic to static and back. The image shows `PBRP-4.0-krispgece-UNOFFICIAL` on the main screen.
+**Status: tested on a Redmi Note 8 Pro with Project Infinity-X 3.12 (Android 16):** the dynamic builds of 25.09.2026 (GApps) and 30.09.2026 (GApps and Vanilla) and the static build of 01.10.2026 (GApps and Vanilla). Checked on the phone: boot, display, touch and adb; decryption with and without a lock-screen PIN (FBE v1); ADB sideload from the menu and with `adb shell twrp sideload`, also with the screen off and with cancel attempts during the install; dirty flash, clean install and downgrade; the ROM's Updater "Local update" in both layouts, also with a lock-screen PIN; fastbootd in both layouts, also when asked for right after the recovery starts; the battery level; and a full round trip from dynamic to static and back. The image shows `PBRP-4.0-krispgece-UNOFFICIAL` on the main screen.
 
 ## How the layout is chosen
 
@@ -64,7 +64,7 @@ Forked from [Saikrishna1504/device_xiaomi_begonia-pbrp](https://github.com/Saikr
 
 ## Building
 
-This tree needs the begonia patch series for PBRP's `bootable/recovery` (branch `android-12.1-begonia` on top of PBRP `android-12.1`): the layout property, the LP-metadata super check, `TW_SUPER_MULTI_BLOCK_DEVICES`, the `perdevice` flag, `PB_UNOFFICIAL_TAG` and the English strings for these messages come from there.
+This tree needs the begonia patch series for PBRP's `bootable/recovery` (branch `android-12.1-begonia` on top of PBRP `android-12.1`): the layout property, the LP-metadata super check, `TW_SUPER_MULTI_BLOCK_DEVICES`, the `perdevice` flag, `PB_UNOFFICIAL_TAG` and the English strings for these messages come from there. Among its fixes to PBRP itself: a reboot to fastbootd or sideload asked for while the recovery is still starting is kept, `adb shell twrp sideload` installs the package once and no longer restarts the recovery afterwards, and the startup arguments are logged on one line.
 
 ```bash
 repo init --depth=1 -u https://github.com/PitchBlackRecoveryProject/manifest_pb -b android-12.1
