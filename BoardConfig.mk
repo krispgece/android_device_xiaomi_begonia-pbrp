@@ -153,6 +153,10 @@ TW_INCLUDE_REPACKTOOLS := true
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_FRAMERATE := 60
 TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone4/temp
+# Battery level and charging state from sysfs: through the health HAL
+# (GetBatteryInfo) TWRP's process gets DEAD_OBJECT from hwservicemanager and
+# then shows a fixed 100 %.
+TW_USE_LEGACY_BATTERY_SERVICES := true
 TW_PREPARE_DATA_MEDIA_EARLY := true
 
 # Dynamic partitions: fastbootd and the LP tools. PBRP honours the LP tool
